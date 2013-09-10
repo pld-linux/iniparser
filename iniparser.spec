@@ -31,11 +31,12 @@ using %{name}, you will need to install %{name}-devel.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/%{_includedir} $RPM_BUILD_ROOT/%{_libdir}
-install -t $RPM_BUILD_ROOT/%{_includedir}/ src/dictionary.h src/iniparser.h
-install -t $RPM_BUILD_ROOT/%{_libdir}/ libiniparser.so.0
-mv $RPM_BUILD_ROOT/%{_libdir}/libiniparser.so{.0,}
-ln -s libiniparser.so $RPM_BUILD_ROOT/%{_libdir}/libiniparser.so.0
+install -d $RPM_BUILD_ROOT%{_includedir} $RPM_BUILD_ROOT%{_libdir}
+install -t $RPM_BUILD_ROOT%{_includedir} src/dictionary.h src/iniparser.h
+install -t $RPM_BUILD_ROOT%{_libdir}/ libiniparser.so.0
+ln -s libiniparser.so.0 $RPM_BUILD_ROOT%{_libdir}/libiniparser.so
+install -t $RPM_BUILD_ROOT%{_libdir}/ libiniparser.a
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -47,10 +48,10 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc README LICENSE
-%attr(755,root,root) %{_libdir}/lib%{name}.so
-%ghost %{_libdir}/lib%{name}.so.0
+%attr(755,root,root) %{_libdir}/lib%{name}.so.0
 
 %files devel
 %defattr(644,root,root,755)
+%{_libdir}/lib%{name}.so
 %{_libdir}/lib%{name}.a
 %{_includedir}/*.h
