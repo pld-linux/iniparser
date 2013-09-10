@@ -3,7 +3,7 @@ Name:		iniparser
 Version:	3.1
 Release:	0.1
 License:	MIT
-Group:		Development/Libraries
+Group:		Libraries
 Source0:	http://ndevilla.free.fr/iniparser/%{name}-%{version}.tar.gz
 # Source0-md5:	0aa4f995468ed390caf323f50a285bc3
 URL:		http://ndevilla.free.fr/iniparser
@@ -15,7 +15,7 @@ to hold application configuration information.
 
 %package devel
 Summary:	Header files, libraries and development documentation for %{name}
-Group:		Development/Libraries
+Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description devel
