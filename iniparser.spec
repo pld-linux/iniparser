@@ -1,14 +1,17 @@
 Summary:	C library for parsing "INI-style" files
 Summary(pl.UTF-8):	Biblioteka C do analizy plików INI
 Name:		iniparser
-Version:	4.1
+Version:	4.2.4
 Release:	1
 License:	MIT
 Group:		Libraries
 #Source0Download: https://github.com/ndevilla/iniparser/tags
 Source0:	https://github.com/ndevilla/iniparser/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	e43b722c71b399ab17c329c04dbdf1d7
-URL:		http://ndevilla.free.fr/iniparser
+# Source0-md5:	2b4b70171712895cb5afdf1247a8889f
+URL:		https://github.com/ndevilla/iniparser
+BuildRequires:	cmake >= 3.18
+BuildRequires:	rpm-build >= 4.6
+BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -47,6 +50,7 @@ Biblioteka statyczna iniParser.
 Summary:	API documentation for iniParser library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki iniParser
 Group:		Documentation
+BuildArch:	noarch
 
 %description apidocs
 API documentation for iniParser library.
@@ -58,19 +62,20 @@ Dokumentacja API biblioteki iniParser.
 %setup -q
 
 %build
-LDFLAGS="%{rpmldflags} %{rpmcflags}" \
-%{__make} \
-	CC="%{__cc}" \
-	ADDITIONAL_CFLAGS="%{rpmcflags} %{rpmcppflags}"
+%cmake -B build \
+	-DCMAKE_INSTALL_INCLUDEDIR=include \
+	-DCMAKE_INSTALL_LIBDIR=%{_lib}
+
+%{__make} -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_includedir},%{_libdir}}
 
-cp -p src/{dictionary.h,iniparser.h} $RPM_BUILD_ROOT%{_includedir}
-install -p libiniparser.so.1 $RPM_BUILD_ROOT%{_libdir}
-ln -sf libiniparser.so.1 $RPM_BUILD_ROOT%{_libdir}/libiniparser.so
-cp -p libiniparser.a $RPM_BUILD_ROOT%{_libdir}
+%{__make} -C build install \
+	DESTDIR=$RPM_BUILD_ROOT
+
+# packaged as %doc
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/html
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -82,13 +87,15 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS FAQ-en.md LICENSE README.md
 %lang(zh_CN) %doc FAQ-zhcn.md
-%attr(755,root,root) %{_libdir}/libiniparser.so.1
+%attr(755,root,root) %{_libdir}/libiniparser.so.*.*.*
+%ghost %{_libdir}/libiniparser.so.4
 
 %files devel
 %defattr(644,root,root,755)
 %{_libdir}/libiniparser.so
-%{_includedir}/dictionary.h
-%{_includedir}/iniparser.h
+%{_includedir}/iniparser
+%{_pkgconfigdir}/iniparser.pc
+%{_libdir}/cmake/iniparser
 
 %files static
 %defattr(644,root,root,755)
@@ -96,4 +103,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files apidocs
 %defattr(644,root,root,755)
-%doc html/*.{css,html,gif,png}
+%doc build/html/{search,*.css,*.html,*.js,*.png}
