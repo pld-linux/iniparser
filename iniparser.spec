@@ -1,15 +1,20 @@
+#
+# Conditional build:
+%bcond_without	apidocs		# API documentation
+
 Summary:	C library for parsing "INI-style" files
 Summary(pl.UTF-8):	Biblioteka C do analizy plików INI
 Name:		iniparser
-Version:	4.2.4
+Version:	4.2.6
 Release:	1
 License:	MIT
 Group:		Libraries
 #Source0Download: https://github.com/ndevilla/iniparser/tags
 Source0:	https://github.com/ndevilla/iniparser/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	2b4b70171712895cb5afdf1247a8889f
+# Source0-md5:	225e439bf6940377b7a334b4befa1b18
 URL:		https://github.com/ndevilla/iniparser
 BuildRequires:	cmake >= 3.18
+%{?with_apidocs:BuildRequires:	doxygen}
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.605
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -63,6 +68,7 @@ Dokumentacja API biblioteki iniParser.
 
 %build
 %cmake -B build \
+	%{?with_apidocs:-DBUILD_DOCS=ON} \
 	-DCMAKE_INSTALL_INCLUDEDIR=include \
 	-DCMAKE_INSTALL_LIBDIR=%{_lib}
 
@@ -74,8 +80,10 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+%if %{with apidocs}
 # packaged as %doc
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}/html
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -101,6 +109,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_libdir}/libiniparser.a
 
+%if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
 %doc build/html/{search,*.css,*.html,*.js,*.png}
+%endif
